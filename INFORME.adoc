@@ -1,0 +1,130 @@
+# marginet-muller-amoros-rosales-db2-uces
+
+= Bases de Datos II - Segundo Cuatrimestre 2023: Trabajo Práctico
+Lucas_Alejandro Marginet_Campos <lucasmarginetntick@gmail.com>; Ulises Muller_Mastrocola <ulisesmullerntick@gmail.com>; 
+Ricardo_Benjamin Rosales_Martinelli <ricardorosalesmartinelli@gmail.com>; Facundo Amoros <facundoamoros8@gmail.com>
+v1, {docdate}.
+:title-page:
+:numbered:
+:source-highlighter: coderay
+:tabsize: 4
+
+== Introducción
+
+El trabajo es grupal, en grupos de, exactamente, 4 integrantes. Se debe realizar en un repositorio privado git, hosteado en Gitlab con el apellido de les cuatro integrantes, separados con guiones, seguidos del string ‘-db2-uces’ como nombre del proyecto.
+La fecha de entrega máxima es el 17 de noviembre de 2023 a las 1900hs, con una defensa presencial del trabajo práctico por cada grupo.
+
+
+== Descripción
+
+El trabajo nos lo dividimos entre todos de manera que cada uno pueda trabajar por su parte. Las funciones y triggers las dividimos entre los 4 y el resto de cosas entre 2. Esto en práctica era algo bueno pero tuvimos complicaciones al comunicarnos las dificultades entre nosotros. Complicándonos más las cosas.
+
+Algunos tenían problemas de tiempo, a otros no les funcionaba la máquina virtual correctamente y se les complicaba hacer commits.
+
+Pero dentro de todo el trabajo al principio fue fácil pero tedioso, tener que ingresar tantos datos en tantas tablas sin que choquen entre ellos tomo una buena cantidad de tiempo.
+
+Las keys funcionan perfecto y el menú siempre funciono sin problema.
+
+Donde realmente se complicó el trabajo fue durante las funciones. 
+
+La primera función se nos complicaba ya que no sabíamos recorrer columnas especificas con _loops_.
+Lo resolvimos al usar *cursor* en las variables a comparar ya que los mismos la contenían haciendo más fácil su comparación.
+Luego fue cuestión de terminarla y funciono sin problemas.
+
+La segunda función termino no funcionando. Nunca se nos ocurrió como ingresar el resto de datos del turno a un turno ya creado...
+
+Y así sucesivamente con el resto de funciones, los problemas se iban acumulando, las soluciones no llegaban, y teniendo trabajos que hacer en el resto de las materias, se nos terminó acabando el tiempo.
+
+
+
+== Implementación
+
+En esta sección se incluye el código fuente correctamente formateado—y comentado, si corresponde.
+
+Además, por cada fragmento de código
+relevante—i.e. función, método, procedimiento—se debe dar una
+breve descripción, decir qué hace, y especificar los parámetros que
+toma la función/método/procedimiento, junto con los valores que devuelve
+ó modifica.
+
+_No debería incluirse el código de librerías/frameworks que se
+utilicen—a no ser que sea absolutamente necesario._
+
+.Implementación menú postgresql
+[source, sql]
+func menu() {         /* al seleccionar tal cosa ejecuta tal función. toma el parámetro sele, el cual al darle una letra especifica ejecuta un if */ 
+    sele:= ""
+    for {
+      fmt.Scanf("%s", &sele)
+      if "x" == sele {
+        funcion()
+      }  
+    }
+}
+
+.Función ejemplo postgresql
+[source, sql]
+create or replace function generar_liquidacion_mensual(p_nro_obra_social INT, p_desde DATE, p_hasta DATE)
+returns void as $$
+declare
+begin
+    
+    insert into liquidacion_cabecera (nro_obra_social, desde, hasta, total)
+    values(p_nro_obra_social, p_desde, p_hasta, 0);
+    
+    update liquidacion_cabecera
+    set total = (select sum(t.monto_obra_social) from turno t
+                 where estado = 'Atendido' 
+                 and t.nro_obra_social_consulta = liquidacion_cabecera.nro_obra_social_consulta 
+                 group by extract(month from t.fecha));
+
+   update turno
+    set estado = 'Liquidado'
+    where fecha between p_desde and p_hasta
+    and nro_obra_social_consulta = p_nro_obra_social
+    and estado = 'Atendido';
+
+    insert into liquidacion_detalle (nro_liquidacion)
+    select l.nro_liquidacion
+    from turno t, liquidacion_cabecera l
+    where estado = 'Liquidado'
+    and not exists(
+      select 1
+      from liquidacion_detalle d
+      where d.nro_liquidacion = l.nro_liquidacion
+    );
+    
+    update liquidacion_detalle
+    set f_atencion = subquery.fecha,
+        nro_afiliade = subquery.nro_afiliade,
+        dni_paciente = subquery.dni_paciente,
+        nombre_paciente = subquery.nombre_paciente,
+        apellido_paciente = subquery.apellido_paciente,
+        dni_medique = subquery.dni_medique,
+        nombre_medique = subquery.nombre,
+        apellido_medique = subquery.apellido,
+        especialidad = subquery.especialidad,
+        monto = subquery.monto_obra_social
+    from (select distinct t.fecha, p.nro_afiliade, p.dni_paciente,
+          p.nombre as nombre_paciente, p.apellido as apellido_paciente, m.dni_medique, m.nombre, m.apellido,
+          m.especialidad, t.monto_obra_social
+          from turno t, paciente p, medique m
+          where t.nro_afiliade_consulta = p.nro_afiliade and
+                t.dni_medique = m.dni_medique) as subquery, turno
+    where turno.fecha between p_desde and p_hasta;
+end
+$$ language plpgsql;
+
+
+== Conclusiones
+
+En general, creo que el proceso que tomamos para el desarrollo del trabajo no fue el mejor. 
+Como se mencionó anteriormente, tuvimos problemas que no deberían pasar, como comunicarnos los problemas entre nosotros y que la máquina virtual no le funcione a algunos miembros del grupo.
+Fuera de los problemas y mas allá de no haber logrado el objetivo final del trabajo, creo que individualmente todos los miembros del grupo hicieron lo que pudieron.
+
+Como conclusión del trabajo en sí, creo que la primera mitad está muy bien y que con un poco más de tiempo, las funciones iban a terminar saliendo.
+
+personalmente aprendimos mucho durante el trabajo. El funcionamiento correcto de keys, el llamado de funciones en go, escribir código de go en general, fue bastante fructífero. 
+Entre ayer y hoy aprendí muchísimo acerca de PostgreSQL buscando información relevante para hacer funcionar las primeras 2 funciones y la última, que fueron de las que me encargué.
+Además de todo esto, el uso de git y gitlab a través de una terminal es algo que sé que me va a servir mucho a futuro y también lo practique muchísimo.
+

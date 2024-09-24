@@ -1,0 +1,46 @@
+PROBAR RESERVAR TURNO
+
+select reservar_turnos(1, 44458951, '2023-11-22 08:00:00'); --/
+select reservar_turnos(2, 44458952, '2023-11-16 11:00:00'); --/
+select reservar_turnos(3, 44458953, '2023-11-01 07:15:00'); --/
+select reservar_turnos(4, 44458954, '2023-12-14 06:30:00'); --/
+select reservar_turnos(5, 44458955, '2023-12-26 12:00:00'); --/
+select reservar_turnos(8, 44458959, '2023-12-29 16:00:00'); --/
+select reservar_turnos(7, 44458957, '2023-12-17 15:00:00'); --/
+select reservar_turnos(8, 44458958, '2023-11-04 17:45:00'); --/
+select reservar_turnos(9, 44458959, '2023-12-22 14:40:00'); --/
+select reservar_turnos(10, 44458960, '2023-11-09 14:00:00'); --/
+select reservar_turnos(11, 44458961, '2024-01-19 18:00:00'); --¿ no existe
+select reservar_turnos(12, 44458962, '2024-11-28 19:30:00'); --¿ no existe
+select reservar_turnos(13, 44458963, '2024-12-17 23:45:00'); --¿ no existe
+select reservar_turnos(14, 44458964, '2024-12-16 20:00:00'); --¿ no existe
+select reservar_turnos(15, 44458965, '2024-01-30 21:20:00'); --¿ no existe
+select reservar_turnos(16, 44458966, '2023-11-02 02:30:00'); --/
+select reservar_turnos(17, 44458967, '2023-12-25 04:00:00'); --¿ no atiende obra social
+select reservar_turnos(18, 44458968, '2023-11-25 05:00:00'); --/
+select reservar_turnos(19, 44458969, '2023-12-05 04:30:00'); --/
+select reservar_turnos(20, 44458970, '2023-11-08 00:00:00'); --/
+select reservar_turnos(2, 44458952, '2023-11-02 06:00:00'); --/
+select reservar_turnos(2, 44458955, '2023-12-12 17:00:00'); --¿
+select reservar_turnos(10, 44458952, '2023-11-02 08:00:00'); --/
+select reservar_turnos(2, 43458952, '2023-11-09 08:00:00'); --¿ dni medique no va
+select reservar_turnos(3, 44458953, '2023-11-24 12:00:00'); --/
+select reservar_turnos(300, 44458953, '2023-11-24 11:00:00'); --¿ historia clinica no va
+select reservar_turnos(3, 44458953, '2023-11-24 10:00:00'); --/
+select reservar_turnos(1, 44458951, '2023-11-01 08:00:00'); --/
+select reservar_turnos(16, 44458953, '2023-11-24 11:00:00'); --/
+select reservar_turnos(2, 44458952, '2023-11-26 08:00:00'); --/
+select reservar_turnos(12, 44458952, '2023-11-26 06:00:00'); --/
+
+PROBAR CANCELAR TURNO
+
+select cancelar_turnos(44458952, '2023-11-25', '2023-11-27');
+
+PROBAR ATENDER TURNO
+
+select atender_turno(292);
+select atender_turno(296);
+
+PROBAR LIQUIDACION MENSUAL
+
+select generar_liquidacion_mensual(723, '2023-11-01', '2023-12-01');
